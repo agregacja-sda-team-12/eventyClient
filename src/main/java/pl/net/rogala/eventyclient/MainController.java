@@ -8,11 +8,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class MainController {
@@ -25,33 +28,34 @@ public class MainController {
     }
 
     @GetMapping("/")
-    public String showListOfAllEvents(Model model){
+    public String showListOfAllEvents(Model model) {
         EventDTO[] events = restTemplate.getForObject("http://localhost:8090/api/events", EventDTO[].class);
         List<EventDTO> eventDTOList = Arrays.asList(events);
 //        System.out.println(eventDTOList);
         model.addAttribute("eventList", eventDTOList);
         return "home";
     }
+
     @GetMapping("/filter")
-    public String showFilterFormForDateRange(Model model){
+    public String showFilterFormForDateRange(Model model) {
         model.addAttribute("filterForm", new FilterForm());
         return "filter";
     }
 
     @PostMapping("/filter")
-    public String handleFilterForm(@ModelAttribute @Valid FilterForm filterForm, BindingResult bindingResult){
-        if(bindingResult.hasErrors()){
+    public String handleFilterForm(@ModelAttribute @Valid FilterForm filterForm, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
             return "/filter";
         }
-        return "redirect: /filteredEvents";
+        Map<String, String> params = new HashMap<>();
+        params.put("startDate", filterForm.getStartDate().toString());
+        params.put("stopDate", filterForm.getStopDate().toString());
+        EventDTO[] events = restTemplate.getForObject("http://localhost:8090/api/events/{startDate},{stopDate}", EventDTO[].class, params);
+        List<EventDTO> filteredEventDTOList = Arrays.asList(events);
+        model.addAttribute("filteredList",filteredEventDTOList);
+        return "filteredEvents";
     }
-//TODO: get params from PostMapping("/filter") and put them into params of api's url
-    @GetMapping("/filteredEvents")
-    public String showFilteredEvents(Model model){
-        EventDTO[] events = restTemplate.getForObject("http://localhost:8090/api/events/{startDate},{stopDate}", EventDTO[].class);
-            List<EventDTO> filteredEventDTOList = Arrays.asList(events);
-            model.addAttribute("filteredEvents", filteredEventDTOList);
-            return "filtered";
-        }
-    }
+}
+
+
 

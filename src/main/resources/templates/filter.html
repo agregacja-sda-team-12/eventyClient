@@ -7,9 +7,10 @@
 <body>
 <form method="post" th:action="@{/filter}" th:object="${filterForm}">
 
-    <br>Początek <input type="date" th:field="*{{startDate}}" th:errorClass="error">
+    <br>Początek <input type="date" th:field="*{startDate}" th:errorClass="error">
     <span class="error" th:errors="*{startDate}"></span>
-    <br>Koniec <input type="date" th:field="*{stopDate}">
+    <br>Koniec <input type="date" th:field="*{stopDate}" th:errorClass="error">
+    <span class="error" th:errors="*{stopDate}"></span>
     <br><input type="submit" value="Filtruj">
 
 </body>

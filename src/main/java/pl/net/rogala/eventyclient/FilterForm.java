@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class FilterForm {
-    @NotNull(message = "Należy podać początek zakres!")
+    @NotNull(message = "Należy podać początek zakresu!")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
     @NotNull(message = "Należy podać koniec zakresu!")
