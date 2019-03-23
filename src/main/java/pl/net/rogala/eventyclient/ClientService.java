@@ -19,13 +19,13 @@ public class ClientService {
         this.restTemplate = restTemplateBuilder.build();
     }
 
-    public List<EventDTO> prepareListOfEvents(){
+    public List<EventDTO> prepareListOfEvents() {
         EventDTO[] events = restTemplate.getForObject("http://localhost:8090/api/events", EventDTO[].class);
         List<EventDTO> eventDTOList = Arrays.asList(events);
         return eventDTOList;
     }
 
-    public List<EventDTO> prepareListOfFilteredEvents(FilterForm filterForm){
+    public List<EventDTO> prepareListOfFilteredEvents(FilterForm filterForm) {
         Map<String, String> params = new HashMap<>();
         params.put("startDate", filterForm.getStartDate().toString());
         params.put("stopDate", filterForm.getStopDate().toString());
@@ -33,5 +33,4 @@ public class ClientService {
         List<EventDTO> filteredEventDTOList = Arrays.asList(events);
         return filteredEventDTOList;
     }
-
 }
