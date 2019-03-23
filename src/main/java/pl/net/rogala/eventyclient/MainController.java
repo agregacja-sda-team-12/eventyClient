@@ -8,7 +8,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
@@ -21,18 +20,17 @@ import java.util.Map;
 public class MainController {
 
     private RestTemplate restTemplate;
+    private ClientService clientService;
 
     @Autowired
-    public MainController(RestTemplateBuilder restTemplateBuilder) {
+    public MainController(RestTemplateBuilder restTemplateBuilder, ClientService clientService) {
         this.restTemplate = restTemplateBuilder.build();
+        this.clientService = clientService;
     }
 
     @GetMapping("/")
     public String showListOfAllEvents(Model model) {
-        EventDTO[] events = restTemplate.getForObject("http://localhost:8090/api/events", EventDTO[].class);
-        List<EventDTO> eventDTOList = Arrays.asList(events);
-//        System.out.println(eventDTOList);
-        model.addAttribute("eventList", eventDTOList);
+        model.addAttribute("eventList", clientService.prepareListOfEvents());
         return "home";
     }
 
@@ -47,12 +45,7 @@ public class MainController {
         if (bindingResult.hasErrors()) {
             return "/filter";
         }
-        Map<String, String> params = new HashMap<>();
-        params.put("startDate", filterForm.getStartDate().toString());
-        params.put("stopDate", filterForm.getStopDate().toString());
-        EventDTO[] events = restTemplate.getForObject("http://localhost:8090/api/events/{startDate},{stopDate}", EventDTO[].class, params);
-        List<EventDTO> filteredEventDTOList = Arrays.asList(events);
-        model.addAttribute("filteredList",filteredEventDTOList);
+        model.addAttribute("filteredList",clientService.prepareListOfFilteredEvents(filterForm));
         return "filteredEvents";
     }
 }
